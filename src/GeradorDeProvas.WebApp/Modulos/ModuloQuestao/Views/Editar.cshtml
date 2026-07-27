@@ -1,0 +1,111 @@
+@{
+    Layout = "_Layout";
+    ViewBag.Titulo = "Edição de Questão";
+}
+
+@model EditarQuestaoViewModel;
+
+<form class="card border-primary-subtle shadow-sm mx-auto p-4" style="max-width: 780px;" asp-action="Editar" asp-route-id="@Model.Id" method="post">
+    <input asp-for="Id" type="hidden">
+    <div asp-validation-summary="All" class="text-danger small fw-semibold mb-3"></div>
+
+    <div class="mb-3">
+        <label asp-for="Enunciado" class="form-label fw-semibold text-primary text-uppercase small">Enunciado</label>
+        <textarea asp-for="Enunciado" class="form-control" rows="4"></textarea>
+        <span asp-validation-for="Enunciado" class="text-danger small fw-semibold"></span>
+    </div>
+
+    <div class="mb-4">
+        <label asp-for="MateriaId" class="form-label fw-semibold text-primary text-uppercase small">Matéria</label>
+        <select asp-for="MateriaId" asp-items="ViewBag.Materias" class="form-select">
+            <option value="">Selecione uma matéria</option>
+        </select>
+        <span asp-validation-for="MateriaId" class="text-danger small fw-semibold"></span>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="text-primary mb-0">Alternativas</h5>
+        <button id="adicionarAlternativa" class="btn btn-outline-primary btn-sm rounded-pill px-3" type="button">Adicionar alternativa</button>
+    </div>
+    <p class="text-secondary small">Configure de duas a quatro alternativas e marque exatamente uma como correta.</p>
+
+    <div id="alternativas" class="d-flex flex-column gap-2">
+        @for (int i = 0; i < Model.Alternativas.Count; i++)
+        {
+            <div class="alternative-item border rounded-3 p-3">
+                <div class="row g-2 align-items-center">
+                    <div class="col">
+                        <label class="visually-hidden" for="Alternativas_@(i)__Texto">Texto da alternativa</label>
+                        <input id="Alternativas_@(i)__Texto" name="Alternativas[@i].Texto" value="@Model.Alternativas[i].Texto" type="text" class="form-control" placeholder="Texto da alternativa">
+                        <span asp-validation-for="Alternativas[i].Texto" class="text-danger small fw-semibold"></span>
+                    </div>
+                    <div class="col-auto form-check">
+                        <input id="Alternativas_@(i)__Correta" name="Alternativas[@i].Correta" value="true" type="checkbox" class="form-check-input" @(Model.Alternativas[i].Correta ? "checked" : string.Empty)>
+                        <label class="form-check-label" for="Alternativas_@(i)__Correta">Correta</label>
+                    </div>
+                    <div class="col-auto">
+                        <button class="removerAlternativa btn btn-outline-danger btn-sm rounded-pill px-3" type="button">Remover</button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="d-flex justify-content-end gap-2 mt-4">
+        <a class="btn btn-outline-primary rounded-pill px-4" asp-action="Listar">Voltar</a>
+        <button class="btn btn-primary rounded-pill px-4" type="submit">Confirmar</button>
+    </div>
+</form>
+
+<script>
+    (() => {
+        const container = document.getElementById('alternativas');
+        const addButton = document.getElementById('adicionarAlternativa');
+
+        function reindexar() {
+            container.querySelectorAll('.alternative-item').forEach((item, index) => {
+                item.querySelector('input[name$=".Texto"]').name = `Alternativas[${index}].Texto`;
+                item.querySelector('input[name$=".Correta"]').name = `Alternativas[${index}].Correta`;
+            });
+        }
+
+        function atualizarBotoes() {
+            const itens = container.querySelectorAll('.alternative-item');
+            container.querySelectorAll('.removerAlternativa').forEach(button => {
+                button.disabled = itens.length <= 2;
+            });
+            addButton.disabled = itens.length >= 4;
+        }
+
+        addButton.addEventListener('click', () => {
+            const index = container.querySelectorAll('.alternative-item').length;
+            const item = document.createElement('div');
+            item.className = 'alternative-item border rounded-3 p-3';
+            item.innerHTML = `
+                <div class="row g-2 align-items-center">
+                    <div class="col">
+                        <label class="visually-hidden">Texto da alternativa</label>
+                        <input name="Alternativas[${index}].Texto" type="text" class="form-control" placeholder="Texto da alternativa">
+                    </div>
+                    <div class="col-auto form-check">
+                        <input name="Alternativas[${index}].Correta" value="true" type="checkbox" class="form-check-input">
+                        <label class="form-check-label">Correta</label>
+                    </div>
+                    <div class="col-auto">
+                        <button class="removerAlternativa btn btn-outline-danger btn-sm rounded-pill px-3" type="button">Remover</button>
+                    </div>
+                </div>`;
+            container.appendChild(item);
+            atualizarBotoes();
+        });
+
+        container.addEventListener('click', event => {
+            if (!event.target.classList.contains('removerAlternativa')) return;
+            event.target.closest('.alternative-item').remove();
+            reindexar();
+            atualizarBotoes();
+        });
+
+        atualizarBotoes();
+    })();
+</script>

@@ -1,0 +1,33 @@
+@{
+    Layout = "_Layout";
+    ViewBag.Titulo = "Cadastro de Matéria";
+}
+
+@model CadastrarMateriaViewModel;
+
+<form class="card border-primary-subtle shadow-sm mx-auto p-4" style="max-width: 620px;" asp-action="Cadastrar" method="post">
+    <div class="mb-3">
+        <label asp-for="Nome" class="form-label fw-semibold text-primary text-uppercase small">Nome</label>
+        <input asp-for="Nome" type="text" class="form-control">
+        <span asp-validation-for="Nome" class="text-danger small fw-semibold"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="DisciplinaId" class="form-label fw-semibold text-primary text-uppercase small">Disciplina</label>
+        <select asp-for="DisciplinaId" asp-items="ViewBag.Disciplinas" class="form-select">
+            <option value="">Selecione uma disciplina</option>
+        </select>
+        <span asp-validation-for="DisciplinaId" class="text-danger small fw-semibold"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Serie" class="form-label fw-semibold text-primary text-uppercase small">Série</label>
+        <input asp-for="Serie" type="number" min="1" class="form-control">
+        <span asp-validation-for="Serie" class="text-danger small fw-semibold"></span>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2 mt-4">
+        <a class="btn btn-outline-primary rounded-pill px-4" asp-action="Listar">Voltar</a>
+        <button class="btn btn-primary rounded-pill px-4" type="submit">Confirmar</button>
+    </div>
+</form>
