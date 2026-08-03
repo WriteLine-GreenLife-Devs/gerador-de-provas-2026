@@ -12,6 +12,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using GeradorDeProvas.Dominio.Modulos.ModuloProva;
+using GeradorDeProvas.Infra.Modulos.ModuloProva;
 
 namespace GeradorDeProvas.Infra;
 
@@ -70,5 +72,6 @@ public static class InjecaoDeDependencia
         services.AddScoped<IRepositorioDisciplina, RepositorioDisciplinaEmOrm>();
         services.AddScoped<IRepositorioMateria, RepositorioMateriaEmOrm>();
         services.AddScoped<IRepositorioQuestao, RepositorioQuestaoEmOrm>();
+        services.AddScoped<IRepositorioProva, RepositorioProvaEmOrm>();
     }
 }

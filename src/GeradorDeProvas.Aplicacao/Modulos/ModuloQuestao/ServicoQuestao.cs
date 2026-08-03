@@ -1,13 +1,15 @@
 using FluentResults;
 using GeradorDeProvas.Aplicacao.Compartilhado;
 using GeradorDeProvas.Dominio.Modulos.ModuloMateria;
+using GeradorDeProvas.Dominio.Modulos.ModuloProva;
 using GeradorDeProvas.Dominio.Modulos.ModuloQuestao;
 
 namespace GeradorDeProvas.Aplicacao.Modulos.ModuloQuestao;
 
 public class ServicoQuestao(
     IRepositorioQuestao repositorioQuestao,
-    IRepositorioMateria repositorioMateria
+    IRepositorioMateria repositorioMateria,
+    IRepositorioProva? repositorioProva = null
 ) : ServicoBase<Questao>
 {
     public Result Cadastrar(CadastrarQuestaoDto dto)
@@ -70,6 +72,9 @@ public class ServicoQuestao(
         if (questao == null)
             return Falha(string.Empty, "Questão não encontrada.");
 
+        if (PossuiProvasVinculadas(questao.Id))
+            return Falha(string.Empty, "Não é possível excluir esta questão, pois ela está vinculada a uma prova.");
+
         repositorioQuestao.Excluir(id);
 
         return Result.Ok();
@@ -127,5 +132,12 @@ public class ServicoQuestao(
         }
 
         return Result.Ok(materia);
+    }
+
+    private bool PossuiProvasVinculadas(Guid questaoId)
+    {
+        return repositorioProva is not null && repositorioProva
+            .SelecionarTodos()
+            .Any(p => p.Questoes.Any(q => q.Id == questaoId));
     }
 }

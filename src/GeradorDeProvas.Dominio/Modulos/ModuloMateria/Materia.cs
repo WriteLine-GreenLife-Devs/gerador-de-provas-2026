@@ -8,9 +8,9 @@ namespace GeradorDeProvas.Dominio.Modulos.ModuloMateria;
 
 public class Materia : EntidadeBase<Materia>, IEntidadeDoUsuario
 {
-    public string Nome { get; set; } = string.Empty;
+    public string Nome { get; set; }
     public int Serie { get; set; }
-    public Disciplina Disciplina { get; set; } = null!;
+    public Disciplina Disciplina { get; set; }
     public List<Questao> Questoes { get; set; } = [];
     public List<Prova> Provas { get; set; } = [];
     public Guid UserId { get; set; }

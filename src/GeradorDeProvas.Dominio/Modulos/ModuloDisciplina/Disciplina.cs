@@ -7,7 +7,7 @@ namespace GeradorDeProvas.Dominio.Modulos.ModuloDisciplina;
 
 public class Disciplina : EntidadeBase<Disciplina>, IEntidadeDoUsuario
 {
-    public string Nome { get; set; } = string.Empty;
+    public string Nome { get; set; }
     public Guid UserId { get; set; }
     public List<Materia> Materias { get; set; } = [];
     public List<Prova> Provas { get; set; } = [];

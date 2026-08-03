@@ -1,48 +1,63 @@
+using FizzWare.NBuilder;
 using GeradorDeProvas.Dominio.Modulos.ModuloDisciplina;
 using GeradorDeProvas.Dominio.Modulos.ModuloMateria;
 using GeradorDeProvas.Dominio.Modulos.ModuloProva;
 using GeradorDeProvas.Dominio.Modulos.ModuloQuestao;
-using GeradorDeProvas.Infra.Compartilhado.Orm;
-using GeradorDeProvas.Infra.Modulos.ModuloProva;
-using GeradorDeProvas.Testes.Integracao.Identity;
-using Microsoft.EntityFrameworkCore;
+using GeradorDeProvas.Testes.Integracao.Compartilhado.Orm;
 
 namespace GeradorDeProvas.Testes.Integracao.ModuloProva;
 
 [TestClass]
-public sealed class RepositorioProvaEmOrmTests
+public sealed class RepositorioProvaEmOrmTests : RepositorioBaseEmOrmTests
 {
-    private GeradorDeProvasDbContext dbContext = null!;
-    private RepositorioProvaEmOrm repositorio = null!;
-
-    [TestInitialize]
-    public void InicializarRepositorio()
-    {
-        dbContext = CriarDbContext(Guid.NewGuid());
-
-        repositorio = new RepositorioProvaEmOrm(dbContext);
-    }
-
     [TestMethod]
     public void CadastrarESelecionarPorId_CarregaRelacionamentosDaProva()
     {
         // Arranjo
-        Disciplina disciplina = new Disciplina("Matemática");
-        Materia materia = new Materia("Álgebra", 8, disciplina);
+        Disciplina disciplina = Builder<Disciplina>
+            .CreateNew()
+            .With(d => d.Nome = "Matemática")
+            .With(d => d.UserId = Guid.Empty)
+            .Persist();
 
-        Prova prova = new Prova("Prova de Álgebra", disciplina, materia, 8, 5, false);
+        Materia materia = Builder<Materia>
+            .CreateNew()
+            .With(m => m.Nome = "Álgebra")
+            .With(m => m.Serie = 8)
+            .With(m => m.Disciplina = disciplina)
+            .With(m => m.UserId = Guid.Empty)
+            .Persist();
 
-        List<Questao> questoesDisponiveis = Enumerable.Range(1, 5)
-            .Select(indice => new Questao($"Questão {indice}", materia, [new Alternativa("4", false), new Alternativa("7", true)]))
-            .ToList();
+        IList<Questao> questoesDisponiveis = Builder<Questao>
+            .CreateListOfSize(5)
+            .All()
+            .With(q => q.Materia = materia)
+            .With(q => q.Alternativas =
+                Enumerable
+                    .Range(1, 2)
+                    .Select(i => new Alternativa($"Alternativa {i}", i % 2 == 0))
+                    .ToList()
+            )
+            .With(q => q.UserId = Guid.Empty)
+            .Persist();
 
-        prova.SortearQuestoes(questoesDisponiveis, new Random(70));
+        Prova prova = Builder<Prova>
+            .CreateNew()
+            .With(p => p.Titulo = "Prova de Álgebra")
+            .With(p => p.Disciplina = disciplina)
+            .With(p => p.Materia = materia)
+            .With(p => p.Serie = 8)
+            .With(p => p.QuantidadeQuestoes = 5)
+            .With(p => p.ProvaRecuperacao = false)
+            .With(p => p.UserId = Guid.Empty)
+            .Do(p => p.SortearQuestoes(questoesDisponiveis, new Random(70)))
+            .Build();
 
         // Ação
-        repositorio.Cadastrar(prova);
+        repositorioProva.Cadastrar(prova);
         dbContext.ChangeTracker.Clear();
 
-        Prova? provaSelecionada = repositorio.SelecionarPorId(prova.Id);
+        Prova? provaSelecionada = repositorioProva.SelecionarPorId(prova.Id);
 
         // Asserção
         Assert.IsNotNull(provaSelecionada);
@@ -57,30 +72,66 @@ public sealed class RepositorioProvaEmOrmTests
     public void Editar_AtualizaProvaExistente()
     {
         // Arranjo
-        Disciplina disciplina = new Disciplina("Matemática");
-        Materia materia = new Materia("Álgebra", 8, disciplina);
+        Disciplina disciplina = Builder<Disciplina>
+            .CreateNew()
+            .With(d => d.Nome = "Matemática")
+            .With(d => d.UserId = Guid.Empty)
+            .Persist();
 
-        Prova prova = new Prova("Prova de Álgebra", disciplina, materia, 8, 5, false);
+        Materia materia = Builder<Materia>
+            .CreateNew()
+            .With(m => m.Nome = "Álgebra")
+            .With(m => m.Serie = 8)
+            .With(m => m.Disciplina = disciplina)
+            .With(m => m.UserId = Guid.Empty)
+            .Persist();
 
-        List<Questao> questoesDisponiveis = Enumerable.Range(1, 5)
-            .Select(indice => new Questao($"Questão {indice}", materia, [new Alternativa("4", false), new Alternativa("7", true)]))
-            .ToList();
+        IList<Questao> questoesDisponiveis = Builder<Questao>
+            .CreateListOfSize(5)
+            .All()
+            .With(q => q.Materia = materia)
+            .With(q => q.Alternativas =
+                Enumerable
+                    .Range(1, 2)
+                    .Select(i => new Alternativa($"Alternativa {i}", i % 2 == 0))
+                    .ToList()
+            )
+            .With(q => q.UserId = Guid.Empty)
+            .Persist();
 
-        prova.SortearQuestoes(questoesDisponiveis, new Random(70));
+        Prova prova = Builder<Prova>
+            .CreateNew()
+            .With(p => p.Titulo = "Prova de Álgebra")
+            .With(p => p.Disciplina = disciplina)
+            .With(p => p.Materia = materia)
+            .With(p => p.Serie = 8)
+            .With(p => p.QuantidadeQuestoes = 5)
+            .With(p => p.ProvaRecuperacao = false)
+            .With(p => p.UserId = Guid.Empty)
+            .Do(p => p.SortearQuestoes(questoesDisponiveis, new Random(70)))
+            .Persist();
 
-        repositorio.Cadastrar(prova);
-
-        Prova provaAtualizada = new Prova("Prova Final", disciplina, null!, 8, 5, true);
+        Prova provaAtualizada = Builder<Prova>
+            .CreateNew()
+            .With(p => p.Titulo = "Prova Final")
+            .With(p => p.Disciplina = disciplina)
+            .With(p => p.Materia = null)
+            .With(p => p.Serie = 8)
+            .With(p => p.QuantidadeQuestoes = 5)
+            .With(p => p.ProvaRecuperacao = true)
+            .With(p => p.UserId = Guid.Empty)
+            .Do(p => p.SortearQuestoes(questoesDisponiveis, new Random(70)))
+            .Build();
 
         // Ação
-        bool conseguiuEditar = repositorio.Editar(prova.Id, provaAtualizada);
+        bool conseguiuEditar = repositorioProva.Editar(prova.Id, provaAtualizada);
         dbContext.ChangeTracker.Clear();
 
         // Asserção
         Assert.IsTrue(conseguiuEditar);
         Assert.AreEqual(
             "Prova Final",
-            repositorio.SelecionarPorId(prova.Id)!.Titulo
+            repositorioProva.SelecionarPorId(prova.Id)!.Titulo
         );
     }
 
@@ -88,36 +139,84 @@ public sealed class RepositorioProvaEmOrmTests
     public void Excluir_RemoveProvaExistente()
     {
         // Arranjo
-        Disciplina disciplina = new Disciplina("Matemática");
-        Materia materia = new Materia("Álgebra", 8, disciplina);
+        Disciplina disciplina = Builder<Disciplina>
+            .CreateNew()
+            .With(d => d.Nome = "Matemática")
+            .With(d => d.UserId = Guid.Empty)
+            .Persist();
 
-        Prova prova = new Prova("Prova de Álgebra", disciplina, materia, 8, 5, false);
+        Materia materia = Builder<Materia>
+            .CreateNew()
+            .With(m => m.Nome = "Álgebra")
+            .With(m => m.Serie = 8)
+            .With(m => m.Disciplina = disciplina)
+            .With(m => m.UserId = Guid.Empty)
+            .Persist();
 
-        List<Questao> questoesDisponiveis = Enumerable.Range(1, 5)
-            .Select(indice => new Questao($"Questão {indice}", materia, [new Alternativa("4", false), new Alternativa("7", true)]))
-            .ToList();
+        IList<Questao> questoesDisponiveis = Builder<Questao>
+            .CreateListOfSize(5)
+            .All()
+            .With(q => q.Materia = materia)
+            .With(q => q.Alternativas =
+                Enumerable
+                    .Range(1, 2)
+                    .Select(i => new Alternativa($"Alternativa {i}", i % 2 == 0))
+                    .ToList()
+            )
+            .With(q => q.UserId = Guid.Empty)
+            .Persist();
 
-        prova.SortearQuestoes(questoesDisponiveis, new Random(70));
+        Prova prova = Builder<Prova>
+            .CreateNew()
+            .With(p => p.Titulo = "Prova de Álgebra")
+            .With(p => p.Disciplina = disciplina)
+            .With(p => p.Materia = materia)
+            .With(p => p.Serie = 8)
+            .With(p => p.QuantidadeQuestoes = 5)
+            .With(p => p.ProvaRecuperacao = false)
+            .With(p => p.UserId = Guid.Empty)
+            .Do(p => p.SortearQuestoes(questoesDisponiveis, new Random(70)))
+            .Persist();
 
-        repositorio.Cadastrar(prova);
+        dbContext.ChangeTracker.Clear();
 
         // Ação
-        bool conseguiuExcluir = repositorio.Excluir(prova.Id);
+        bool conseguiuExcluir = repositorioProva.Excluir(prova.Id);
         dbContext.ChangeTracker.Clear();
 
         // Asserção
         Assert.IsTrue(conseguiuExcluir);
-        Assert.IsNull(repositorio.SelecionarPorId(prova.Id));
+        Assert.IsNull(repositorioProva.SelecionarPorId(prova.Id));
     }
 
     [TestMethod]
     public void SelecionarTodos_RetornaProvasComRelacionamentos()
     {
         // Arranjo
-        Disciplina disciplina = new Disciplina("Matemática");
-        Materia materia = new Materia("Álgebra", 8, disciplina);
+        Disciplina disciplina = Builder<Disciplina>
+            .CreateNew()
+            .With(d => d.Nome = "Matemática")
+            .With(d => d.UserId = Guid.Empty)
+            .Persist();
 
-        Prova prova = new Prova("Prova de Álgebra", disciplina, materia, 8, 5, false);
+        Materia materia = Builder<Materia>
+            .CreateNew()
+            .With(m => m.Nome = "Álgebra")
+            .With(m => m.Serie = 8)
+            .With(m => m.Disciplina = disciplina)
+            .With(m => m.UserId = Guid.Empty)
+            .Persist();
+
+        Prova prova = Builder<Prova>
+            .CreateNew()
+            .With(p => p.Titulo = "Prova de Álgebra")
+            .With(p => p.Disciplina = disciplina)
+            .With(p => p.Materia = materia)
+            .With(p => p.Serie = 8)
+            .With(p => p.QuantidadeQuestoes = 5)
+            .With(p => p.ProvaRecuperacao = false)
+            .With(p => p.UserId = Guid.Empty)
+            .Build();
 
         List<Questao> questoesDisponiveis = Enumerable.Range(1, 5)
             .Select(indice => new Questao($"Questão {indice}", materia, [new Alternativa("4", false), new Alternativa("7", true)]))
@@ -125,26 +224,17 @@ public sealed class RepositorioProvaEmOrmTests
 
         prova.SortearQuestoes(questoesDisponiveis, new Random(70));
 
-        repositorio.Cadastrar(prova);
+        repositorioProva.Cadastrar(prova);
+
         dbContext.ChangeTracker.Clear();
 
         // Ação
-        List<Prova> provas = repositorio.SelecionarTodos();
+        List<Prova> provas = repositorioProva.SelecionarTodos();
 
         // Asserção
         Assert.HasCount(1, provas);
         Assert.AreEqual("Matemática", provas.First().Disciplina.Nome);
         Assert.AreEqual("Álgebra", provas.First().Materia!.Nome);
         Assert.HasCount(5, provas.First().Questoes);
-    }
-
-    private GeradorDeProvasDbContext CriarDbContext(Guid userId)
-    {
-        DbContextOptions<GeradorDeProvasDbContext> options =
-            new DbContextOptionsBuilder<GeradorDeProvasDbContext>()
-                .UseInMemoryDatabase("GeradorDeProvasTestDB_Memory")
-                .Options;
-
-        return new GeradorDeProvasDbContext(options, new ProvedorDeUsuarioFake(userId));
     }
 }
