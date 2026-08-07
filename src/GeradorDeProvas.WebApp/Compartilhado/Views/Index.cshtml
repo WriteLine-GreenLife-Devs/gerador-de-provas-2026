@@ -11,7 +11,10 @@
         </p>
 
         <div class="d-flex flex-wrap gap-2">
-            @* <a class="btn btn-primary rounded-pill px-4" asp-controller="Entidade" asp-action="Listar">Entidades</a> *@
+            <a class="btn btn-primary rounded-pill px-4" asp-controller="Disciplina" asp-action="Listar">Disciplinas</a>
+            <a class="btn btn-primary rounded-pill px-4" asp-controller="Materia" asp-action="Listar">Materia</a>
+            <a class="btn btn-primary rounded-pill px-4" asp-controller="Questao" asp-action="Listar">Questões</a>
+            <a class="btn btn-primary rounded-pill px-4" asp-controller="Prova" asp-action="Listar">Provas</a>
         </div>
 
     </div>
@@ -22,10 +25,22 @@
                 <h3 class="h5 text-primary mb-3">Módulos disponíveis</h3>
 
                 <div class="list-group">
-                    @* <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" asp-controller="Entidade" asp-action="Listar">
-                        Controle de Entidades
+                    <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" asp-controller="Disciplina" asp-action="Listar">
+                        Controle de Disciplinas
                         <span class="badge text-bg-primary rounded-pill">Abrir</span>
-                    </a> *@
+                    </a>
+                    <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" asp-controller="Materia" asp-action="Listar">
+                        Controle de Materias
+                        <span class="badge text-bg-primary rounded-pill">Abrir</span>
+                    </a>
+                    <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" asp-controller="Questao" asp-action="Listar">
+                        Controle de Questões
+                        <span class="badge text-bg-primary rounded-pill">Abrir</span>
+                    </a>
+                    <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" asp-controller="Prova" asp-action="Listar">
+                        Controle de Provas
+                        <span class="badge text-bg-primary rounded-pill">Abrir</span>
+                    </a>
                 </div>
             </div>
         </div>

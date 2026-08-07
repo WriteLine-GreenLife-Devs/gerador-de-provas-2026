@@ -18,5 +18,6 @@ public static class InjecaoDeDependencia
         services.AddScoped<ServicoMateria>();
         services.AddScoped<ServicoQuestao>();
         services.AddScoped<ServicoProva>();
+        services.AddScoped<GeradorPdfProva>();
     }
 }

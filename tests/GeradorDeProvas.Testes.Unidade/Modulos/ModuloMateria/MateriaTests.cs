@@ -48,7 +48,7 @@ public sealed class MateriaTests
     public void Validar_SemDisciplina_DeveRetornar_ErroCorrespondente()
     {
         // Arranjo
-        Disciplina disciplina = null;
+        Disciplina disciplina = null!;
 
         Materia materia = new Materia("Quatro Operações", 2, disciplina);
 

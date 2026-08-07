@@ -78,7 +78,7 @@ public abstract class RepositorioBaseEmOrmTests
     {
         DbContextOptions<GeradorDeProvasDbContext> options =
             new DbContextOptionsBuilder<GeradorDeProvasDbContext>()
-                .UseInMemoryDatabase("GeradorDeProvasTestDB_Memory")
+                .UseInMemoryDatabase($"integracao-{Guid.NewGuid():N}")
                 .Options;
 
         return new GeradorDeProvasDbContext(options, new ProvedorDeUsuarioFake(userId));

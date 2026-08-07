@@ -1,6 +1,5 @@
 using FluentResults;
 using GeradorDeProvas.Aplicacao.Modulos.ModuloDisciplina;
-using GeradorDeProvas.Dominio.Compartilhado;
 using GeradorDeProvas.Dominio.Modulos.ModuloDisciplina;
 using GeradorDeProvas.Dominio.Modulos.ModuloMateria;
 using Moq;

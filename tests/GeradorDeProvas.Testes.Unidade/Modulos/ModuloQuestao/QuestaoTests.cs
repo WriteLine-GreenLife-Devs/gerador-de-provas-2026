@@ -49,7 +49,7 @@ public sealed class QuestaoTests
     {
         // Arranjo
         List<Alternativa> alternativas = [new Alternativa("3", false), new Alternativa("4", true),];
-        Questao questao = new Questao("Quanto é 2 + 2?", null, alternativas);
+        Questao questao = new Questao("Quanto é 2 + 2?", null!, alternativas);
 
         // Ação
         List<string> erros = questao.Validar();

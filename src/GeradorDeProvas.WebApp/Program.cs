@@ -4,11 +4,19 @@ using GeradorDeProvas.Infra.Compartilhado.Orm;
 using GeradorDeProvas.WebApp.Compartilhado;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using QuestPDF.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
+QuestPDF.Settings.License = LicenseType.Community;
+
 // Configuração do container de injeção de dependência
-builder.Services.AddInfraRepositories(builder.Configuration, builder.Logging);
+builder.Services.AddInfraRepositories(
+    builder.Configuration,
+    builder.Logging,
+    builder.Environment
+);
+
 builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddPresentationConfig(builder.Configuration);
 
