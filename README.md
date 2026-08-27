@@ -228,3 +228,7 @@ O arquivo PDF do gabarito deve apresentar:
 ## Requisitos
 
 - [.NET 10.0 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
+
+## Deploy
+
+As instruções para configurar e ativar o workflow de deploy no Azure estão em [`docs/deploy-azure.md`](docs/deploy-azure.md).
